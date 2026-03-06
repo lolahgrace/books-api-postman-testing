@@ -1,0 +1,743 @@
+{
+  "info": {
+    "_postman_id": "d9380d72-07c4-409c-ba93-a1524535279d",
+    "name": "Books API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "23980185"
+  },
+  "item": [
+    {
+      "name": "Create Token",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const randomEmail = 'lolatest' + Date.now() + '@gmail.com';",
+              "pm.environment.set('clientEmail', randomEmail);",
+              "console.log('Generated email: ' + randomEmail);"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "// ✅ Verify response status code",
+              "pm.test('Status is 201 Created', () => {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "// ✅ Validate response body structure",
+              "pm.test('Response contains accessToken field', () => {",
+              "    pm.expect(response).to.have.property('accessToken');",
+              "});",
+              "",
+              "pm.test('Access token is a non-empty string', () => {",
+              "    pm.expect(response.accessToken).to.be.a('string');",
+              "    pm.expect(response.accessToken).to.not.be.empty;",
+              "});",
+              "",
+              "// Save token for subsequent requests",
+              "if (pm.response.code === 201) {",
+              "    pm.environment.set('access_token', response.accessToken);",
+              "    console.log('Token saved: ' + response.accessToken);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {"type": "noauth"},
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"clientName\": \"Lola\",\n    \"clientEmail\": \"{{clientEmail}}\"\n}",
+          "options": {"raw": {"language": "json"}}
+        },
+        "url": {
+          "raw": "https://simple-books-api.click/api-clients/",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["api-clients", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Book Status",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "// ✅ Verify response status code",
+              "pm.test('Status is 200 OK', () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "// ✅ Validate response body structure",
+              "pm.test('Response contains status field', () => {",
+              "    pm.expect(response).to.have.property('status');",
+              "});",
+              "",
+              "pm.test('API status is OK', () => {",
+              "    pm.expect(response.status).to.eql('OK');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {"type": "noauth"},
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://simple-books-api.click/status",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["status"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List of Books",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "// ✅ Verify response status code",
+              "pm.test('Status is 200 OK', () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "// ✅ Validate response body structure",
+              "pm.test('Response is an array', () => {",
+              "    pm.expect(response).to.be.an('array');",
+              "});",
+              "",
+              "pm.test('Books list is not empty', () => {",
+              "    pm.expect(response.length).to.be.above(0);",
+              "});",
+              "",
+              "pm.test('Each book has required fields', () => {",
+              "    response.forEach((book) => {",
+              "        pm.expect(book).to.have.property('id');",
+              "        pm.expect(book).to.have.property('name');",
+              "        pm.expect(book).to.have.property('type');",
+              "        pm.expect(book).to.have.property('available');",
+              "    });",
+              "});",
+              "",
+              "pm.test('Book type is fiction or non-fiction', () => {",
+              "    response.forEach((book) => {",
+              "        pm.expect(book.type).to.be.oneOf(['fiction', 'non-fiction']);",
+              "    });",
+              "});",
+              "",
+              "pm.test('At least one book is available', () => {",
+              "    const available = response.filter(book => book.available === true);",
+              "    pm.expect(available.length).to.be.above(0);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {"type": "noauth"},
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://simple-books-api.click/books",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["books"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Book",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "// ✅ Verify response status code",
+              "pm.test('Status is 200 OK', () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "// ✅ Verify book retrieval",
+              "pm.test('Response contains book id', () => {",
+              "    pm.expect(response).to.have.property('id');",
+              "});",
+              "",
+              "pm.test('Book id is correct', () => {",
+              "    pm.expect(response.id).to.eql(1);",
+              "});",
+              "",
+              "pm.test('Response contains book name', () => {",
+              "    pm.expect(response).to.have.property('name');",
+              "    pm.expect(response.name).to.be.a('string');",
+              "    pm.expect(response.name).to.not.be.empty;",
+              "});",
+              "",
+              "pm.test('Response contains book type', () => {",
+              "    pm.expect(response).to.have.property('type');",
+              "    pm.expect(response.type).to.be.oneOf(['fiction', 'non-fiction']);",
+              "});",
+              "",
+              "pm.test('Response contains price', () => {",
+              "    pm.expect(response).to.have.property('price');",
+              "    pm.expect(response.price).to.be.a('number');",
+              "    pm.expect(response.price).to.be.above(0);",
+              "});",
+              "",
+              "pm.test('Response contains availability', () => {",
+              "    pm.expect(response).to.have.property('available');",
+              "    pm.expect(response.available).to.be.a('boolean');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {"type": "noauth"},
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://simple-books-api.click/books/1",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["books", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Book - Invalid ID (Negative Test)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "// ✅ Negative testing - invalid book ID",
+              "pm.test('Status is 404 Not Found for invalid book ID', () => {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "pm.test('Error message is returned', () => {",
+              "    pm.expect(response).to.have.property('error');",
+              "});",
+              "",
+              "pm.test('Error message is not empty', () => {",
+              "    pm.expect(response.error).to.not.be.empty;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {"type": "noauth"},
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://simple-books-api.click/books/99999",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["books", "99999"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "// ✅ Verify book creation (order)",
+              "pm.test('Status is 201 Created', () => {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "// ✅ Validate response body structure",
+              "pm.test('Response contains created field', () => {",
+              "    pm.expect(response).to.have.property('created');",
+              "});",
+              "",
+              "pm.test('Order created is true', () => {",
+              "    pm.expect(response.created).to.be.true;",
+              "});",
+              "",
+              "pm.test('Response contains orderId', () => {",
+              "    pm.expect(response).to.have.property('orderId');",
+              "    pm.expect(response.orderId).to.not.be.empty;",
+              "});",
+              "",
+              "// Save orderId for subsequent requests",
+              "if (pm.response.code === 201) {",
+              "    pm.environment.set('orderId', response.orderId);",
+              "    console.log('Order ID saved: ' + response.orderId);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{"key": "token", "value": "{{access_token}}", "type": "string"}]
+        },
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"bookId\": 1,\n    \"customerName\": \"John Doe\"\n}",
+          "options": {"raw": {"language": "json"}}
+        },
+        "url": {
+          "raw": "https://simple-books-api.click/orders",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["orders"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Order - Invalid Book ID (Negative Test)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "// ✅ Negative testing - invalid book ID in order",
+              "pm.test('Status is 400 Bad Request for invalid book ID', () => {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "pm.test('Error message is returned', () => {",
+              "    pm.expect(response).to.have.property('error');",
+              "    pm.expect(response.error).to.not.be.empty;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{"key": "token", "value": "{{access_token}}", "type": "string"}]
+        },
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"bookId\": 99999,\n    \"customerName\": \"John Doe\"\n}",
+          "options": {"raw": {"language": "json"}}
+        },
+        "url": {
+          "raw": "https://simple-books-api.click/orders",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["orders"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Orders",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "// ✅ Verify response status code",
+              "pm.test('Status is 200 OK', () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "// ✅ Validate response body structure",
+              "pm.test('Response is an array', () => {",
+              "    pm.expect(response).to.be.an('array');",
+              "});",
+              "",
+              "pm.test('Orders list is not empty', () => {",
+              "    pm.expect(response.length).to.be.above(0);",
+              "});",
+              "",
+              "pm.test('Each order has required fields', () => {",
+              "    response.forEach((order) => {",
+              "        pm.expect(order).to.have.property('id');",
+              "        pm.expect(order).to.have.property('bookId');",
+              "        pm.expect(order).to.have.property('customerName');",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{"key": "token", "value": "{{access_token}}", "type": "string"}]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://simple-books-api.click/orders",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["orders"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "// ✅ Verify book retrieval",
+              "pm.test('Status is 200 OK', () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "// ✅ Validate response body structure",
+              "pm.test('Response contains id field', () => {",
+              "    pm.expect(response).to.have.property('id');",
+              "});",
+              "",
+              "pm.test('Order ID matches saved ID', () => {",
+              "    pm.expect(response.id).to.eql(pm.environment.get('orderId'));",
+              "});",
+              "",
+              "pm.test('Response contains bookId', () => {",
+              "    pm.expect(response).to.have.property('bookId');",
+              "    pm.expect(response.bookId).to.eql(1);",
+              "});",
+              "",
+              "pm.test('Response contains customerName', () => {",
+              "    pm.expect(response).to.have.property('customerName');",
+              "    pm.expect(response.customerName).to.eql('John Doe');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{"key": "token", "value": "{{access_token}}", "type": "string"}]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://simple-books-api.click/orders/{{orderId}}",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Order - Invalid ID (Negative Test)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "// ✅ Negative testing - invalid order ID",
+              "pm.test('Status is 404 Not Found for invalid order ID', () => {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "pm.test('Error message is returned', () => {",
+              "    pm.expect(response).to.have.property('error');",
+              "    pm.expect(response.error).to.not.be.empty;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{"key": "token", "value": "{{access_token}}", "type": "string"}]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://simple-books-api.click/orders/invalid-order-id-99999",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["orders", "invalid-order-id-99999"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ✅ Verify book update",
+              "pm.test('Status is 204 No Content', () => {",
+              "    pm.response.to.have.status(204);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "pm.test('Response body is empty on update', () => {",
+              "    pm.expect(pm.response.text()).to.be.empty;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{"key": "token", "value": "{{access_token}}", "type": "string"}]
+        },
+        "method": "PATCH",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"customerName\": \"Lola Updated\"\n}",
+          "options": {"raw": {"language": "json"}}
+        },
+        "url": {
+          "raw": "https://simple-books-api.click/orders/{{orderId}}",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Verify Order Updated",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "// ✅ Verify update was applied",
+              "pm.test('Status is 200 OK', () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Customer name was updated correctly', () => {",
+              "    pm.expect(response.customerName).to.eql('Lola Updated');",
+              "});",
+              "",
+              "pm.test('Book ID remains unchanged after update', () => {",
+              "    pm.expect(response.bookId).to.eql(1);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{"key": "token", "value": "{{access_token}}", "type": "string"}]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://simple-books-api.click/orders/{{orderId}}",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ✅ Verify book deletion",
+              "pm.test('Status is 204 No Content', () => {",
+              "    pm.response.to.have.status(204);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "pm.test('Response body is empty on delete', () => {",
+              "    pm.expect(pm.response.text()).to.be.empty;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{"key": "token", "value": "{{access_token}}", "type": "string"}]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://simple-books-api.click/orders/{{orderId}}",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Verify Order Deleted (Negative Test)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "// ✅ Verify deletion - order should no longer exist",
+              "pm.test('Status is 404 Not Found after deletion', () => {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "// ✅ Validate response time",
+              "pm.test('Response time is under 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "pm.test('Error message confirms order not found', () => {",
+              "    pm.expect(response).to.have.property('error');",
+              "    pm.expect(response.error).to.not.be.empty;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{"key": "token", "value": "{{access_token}}", "type": "string"}]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://simple-books-api.click/orders/{{orderId}}",
+          "protocol": "https",
+          "host": ["simple-books-api", "click"],
+          "path": ["orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    }
+  ]
+}
