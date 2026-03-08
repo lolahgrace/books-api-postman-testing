@@ -6,6 +6,8 @@
 ![Assertions](https://img.shields.io/badge/Assertions-61%20Passing-brightgreen)
 ![Status](https://img.shields.io/badge/Build-Passing-brightgreen)
 ![Language](https://img.shields.io/badge/Scripts-JavaScript-yellow)
+![Jenkins](https://img.shields.io/badge/CI%2FCD-Jenkins-red)
+![Git](https://img.shields.io/badge/Version%20Control-Git-orange)
 
 A complete API test automation project built using **Postman** and **Newman**, covering the full lifecycle of the [Simple Books API](https://simple-books-api.click). This project demonstrates real-world QA Engineering skills including request chaining, environment variables, automated token management, negative testing, and CI/CD-ready test execution.
 
@@ -19,6 +21,7 @@ A complete API test automation project built using **Postman** and **Newman**, c
 - [Test Collection Structure](#test-collection-structure)
 - [Test Scenarios](#test-scenarios)
 - [Key Features](#key-features)
+- [CI/CD Pipeline](#cicd-pipeline)
 - [Environment Setup](#environment-setup)
 - [How to Run Tests](#how-to-run-tests)
 - [Test Results](#test-results)
@@ -47,6 +50,8 @@ The goal was to automate the full API workflow from authentication to order mana
 | JavaScript | ES6 | Writing test scripts and assertions |
 | Node.js / npm | Latest | Installing Newman and plugins |
 | PowerShell | Windows | Running Newman CLI commands |
+| Jenkins | 2.541.2 | CI/CD pipeline automation |
+| Git | 2.53.0 | Version control and GitHub integration |
 
 ---
 
@@ -225,6 +230,58 @@ DELETE  → DELETE /orders/:id    (Delete Order)
 
 ---
 
+## 🔁 CI/CD Pipeline
+
+This project is integrated with **Jenkins** to run tests automatically.
+
+### How It Works
+```
+Code pushed to GitHub
+        ↓
+Jenkins pulls latest collection from GitHub
+        ↓
+Newman runs all 14 requests and 61 assertions
+        ↓
+Results visible in Jenkins console output
+        ↓
+Build marked as passed ✅ or failed ❌
+```
+
+### Jenkins Job Configuration
+```
+Job Name        → Books-API-Tests
+Job Type        → Freestyle Project
+Source Control  → Git (GitHub repository)
+Branch          → */main
+Build Trigger   → GitHub hook trigger for GITScm polling
+Build Step      → Execute Windows batch command
+```
+
+### Build Command
+```batch
+C:\Users\LENOVO\AppData\Roaming\npm\newman.cmd run BooksAPI.json -e QA_Environment.json
+```
+
+### Jenkins Build History
+| Build | Status | Duration |
+|---|---|---|
+| #1 | ❌ Failed | 5.7s (newman path issue — fixed) |
+| #2 | ✅ Passed | 9.8s |
+
+### Git Branching Workflow
+```
+main branch           → stable, production-ready tests
+feature/update-readme → new feature branch
+        ↓
+Pull Request opened on GitHub
+        ↓
+Reviewed and merged into main
+        ↓
+Feature branch deleted
+```
+
+---
+
 ## ⚙️ Environment Setup
 
 ### Prerequisites
@@ -348,21 +405,21 @@ The API only allows one registration per email. Solved by implementing a pre-req
 - Reading and interpreting HTTP status codes
 - Professional test reporting with HTMLExtra
 - GitHub project documentation
+- Jenkins CI/CD pipeline setup and configuration
+- Git CLI — branching, pull requests and merging
+- Debugging Jenkins build failures from console output
 
 ---
 
 ## 👩‍💻 Author
 
-**Lola**
+**Ololade Adekunle**
 QA Engineer
-- Specializing in API Test Automation
-- Tools: Postman, Newman, JavaScript, Git
+- Tools: Postman, Newman, JavaScript, Git, Jenkins
+- GitHub: [lolahgrace](https://github.com/lolahgrace)
 
 ---
 
 ## 📄 License
 
 This project is open source and available for learning and reference purposes.
-*Last updated: March 2026*
-*Jenkins CI/CD pipeline configured and running*
-
